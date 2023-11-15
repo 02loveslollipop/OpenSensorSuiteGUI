@@ -4,5 +4,7 @@ redis:
   password: wVdsBAqzCaWtaOC7DLVeuj2SuMuZc1dm #Set to your redis server password
 
 gui:
+  graph_update_ms: 1000 #Set to the graph update interval in milliseconds
+  graph_history: 100 #Set to the number of data points to show in the graph
   debug: true #Set true to enable debug mode (not recommended for production)
   

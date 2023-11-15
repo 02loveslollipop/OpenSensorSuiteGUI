@@ -1,2 +1,3 @@
 redis == 5.0.1
 sv-ttk
+numpy

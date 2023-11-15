@@ -6,18 +6,9 @@ import sv_ttk
 
 #Set the config class
 conf = config()
-#Init the redis connection
-
-def connect():
-  return rd.Redis(host=conf.host, port=conf.port, c=conf.password)
-
-
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = main_screen(root)
+    app = main_screen(root,conf)
     sv_ttk.set_theme("dark")
     root.mainloop()
-
-
-
