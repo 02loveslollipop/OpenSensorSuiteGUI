@@ -12,8 +12,6 @@ import time
 from config import config
 import datetime
 
-
-
 class main_screen(ttk.Frame):
     
     def __init__(self, root, conf: config) -> None:
@@ -24,6 +22,12 @@ class main_screen(ttk.Frame):
         self.graphDataY = np.sin(self.graphDataX)
         self.index = -1
         self.current_index_posix_time = 0
+        
+        #handle the window close event
+        root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        
+        #set icon to favicon.ico
+        self.root.iconbitmap('favicon.ico')
         
         #lock the window size
         self.root.resizable(width=False, height=False)
@@ -137,6 +141,10 @@ class main_screen(ttk.Frame):
         self.thread.daemon = True
         self.thread.start()
         
+    def on_closing(self):
+        self.root.destroy()
+        exit()
+        
     def next(self):
         connection = self.redis_connect()
         self.index += 1
@@ -192,7 +200,6 @@ class main_screen(ttk.Frame):
         connection.zremrangebyrank('sensor1', self.index, self.index)
         self.next()
         
-    
     def redis_connect(self) -> rd.Redis:
         connect = rd.Redis(host=self.conf.host, port=self.conf.port, password=self.conf.password)
         return connect
