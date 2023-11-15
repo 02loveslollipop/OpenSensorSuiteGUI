@@ -1,0 +1,8 @@
+redis:
+  host: redis-server.yourdomain.example #Set to your redis server doamin or IP
+  port: 6379 #Set to your redis server port
+  password: wVdsBAqzCaWtaOC7DLVeuj2SuMuZc1dm #Set to your redis server password
+
+gui:
+  debug: true #Set true to enable debug mode (not recommended for production)
+  
