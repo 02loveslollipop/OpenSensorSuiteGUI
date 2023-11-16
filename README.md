@@ -2,7 +2,7 @@
 > A simple sensor monitoring utility for ESP32 microcontrollers, powered by Python and Redis.
 
 ## Introduction
-OpenSensorSuite is a simple sensor monitoring utility for ESP32 microcontrollers using a RedisDB for the data persistence. It is designed to be a simple, lightweight, and easy to use solution for monitoring sensor data from ESP32 microcontrollers. This repository contains the source code for GUI to view and manage the data. The source code for the ESP32 microcontroller can be found [here](https://github.com/02loveslollipop/OpenSensorSuite-ESP32).
+OpenSensorSuite is a simple sensor monitoring utility for ESP32 microcontrollers using a RedisDB for the data persistence. It is designed to be a simple, lightweight, and easy to use solution for monitoring sensor data from ESP32 microcontrollers. This repository contains the source code for GUI to view and manage the data. The source code for the ESP32 microcontroller can be found [here](https://github.com/02loveslollipop/OpenSensorSuiteESP32). And the data convertion service source code can be found [here](https://github.com/02loveslollipop/OpenSensorSuiteDataConvertion)
 
 ## Installation
 
