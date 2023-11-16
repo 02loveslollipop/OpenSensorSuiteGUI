@@ -82,9 +82,6 @@ class main_screen(ttk.Frame):
         self.sensorValueEntry = ttk.Entry(self.entryFrame)
         self.sensorValueEntry.grid(row=2, column=1,pady=5,padx=5)
         
-        #update values with redis data
-        self.next()
-        
         #frame for the buttons
         self.buttonFrame = ttk.Frame(self.entryFrame)
         self.buttonFrame.grid(row=3, column=0, columnspan=2)
@@ -132,6 +129,9 @@ class main_screen(ttk.Frame):
         self.ax.set_title("Sensor Data")
         self.ax.set_ylabel("Value")
 
+        #update values of the entries with redis data
+        self.next()
+
         #animation
         self.animation = FuncAnimation(self.figure, self.update_plot, interval=self.conf.graph_time)
         
@@ -148,61 +148,76 @@ class main_screen(ttk.Frame):
     def next(self):
         connection = self.redis_connect()
         self.index += 1
-        result = connection.zrange('sensor1', self.index, self.index, withscores=True)
-        if result == []:
+        try:
+            result = connection.zrange('sensor1', self.index, self.index, withscores=True)
+            if result == []:
+                self.index -= 1
+                return
+            value = result[0][0]
+            self.current_index_posix_time = float(result[0][1])
+            date = datetime.datetime.fromtimestamp(self.current_index_posix_time).strftime('%Y-%m-%d %H:%M:%S')
+            self.sensorDateEntry.config(state="normal")
+            self.indexEntry.config(state="normal")
+            self.sensorDateEntry.delete(0, tk.END)
+            self.sensorValueEntry.delete(0, tk.END)
+            self.indexEntry.delete(0, tk.END)
+            self.sensorDateEntry.insert(0, date)
+            self.sensorValueEntry.insert(0, value)
+            self.indexEntry.insert(0, self.index)
+            self.indexEntry.config(state="readonly")
+            self.sensorDateEntry.config(state="readonly")
+        except Exception:
             self.index -= 1
             return
-        value = result[0][0]
-        self.current_index_posix_time = float(result[0][1])
-        date = datetime.datetime.fromtimestamp(self.current_index_posix_time).strftime('%Y-%m-%d %H:%M:%S')
-        self.sensorDateEntry.config(state="normal")
-        self.indexEntry.config(state="normal")
-        self.sensorDateEntry.delete(0, tk.END)
-        self.sensorValueEntry.delete(0, tk.END)
-        self.indexEntry.delete(0, tk.END)
-        self.sensorDateEntry.insert(0, date)
-        self.sensorValueEntry.insert(0, value)
-        self.indexEntry.insert(0, self.index)
-        self.indexEntry.config(state="readonly")
-        self.sensorDateEntry.config(state="readonly")
         
     def prev(self):
         connection = self.redis_connect()
         self.index -= 1
-        result = connection.zrange('sensor1', self.index, self.index, withscores=True)
-        if result == []:
+        try:
+            result = connection.zrange('sensor1', self.index, self.index, withscores=True)
+            if result == []:
+                self.index += 1
+                return
+            value = result[0][0]
+            date = datetime.datetime.fromtimestamp(self.current_index_posix_time).strftime('%Y-%m-%d %H:%M:%S')
+            self.sensorDateEntry.config(state="normal")
+            self.indexEntry.config(state="normal")
+            self.sensorDateEntry.delete(0, tk.END)
+            self.sensorValueEntry.delete(0, tk.END)
+            self.indexEntry.delete(0, tk.END)
+            self.sensorDateEntry.insert(0, date)
+            self.sensorValueEntry.insert(0, value)
+            self.indexEntry.insert(0, self.index)
+            self.indexEntry.config(state="readonly")
+            self.sensorDateEntry.config(state="readonly")
+        except Exception:
             self.index += 1
             return
-        value = result[0][0]
-        date = datetime.datetime.fromtimestamp(self.current_index_posix_time).strftime('%Y-%m-%d %H:%M:%S')
-        self.sensorDateEntry.config(state="normal")
-        self.indexEntry.config(state="normal")
-        self.sensorDateEntry.delete(0, tk.END)
-        self.sensorValueEntry.delete(0, tk.END)
-        self.indexEntry.delete(0, tk.END)
-        self.sensorDateEntry.insert(0, date)
-        self.sensorValueEntry.insert(0, value)
-        self.indexEntry.insert(0, self.index)
-        self.indexEntry.config(state="readonly")
-        self.sensorDateEntry.config(state="readonly")
     
     def update(self):
-        connection = self.redis_connect()
         try:
-            value = float(self.sensorValueEntry.get())
-        except ValueError:
+            connection = self.redis_connect()
+            try:
+                value = float(self.sensorValueEntry.get())
+            except ValueError:
+                return
+            connection.zremrangebyrank('sensor1', self.index, self.index)
+            connection.zadd('sensor1', {value: self.current_index_posix_time})
+        except Exception:
             return
-        connection.zremrangebyrank('sensor1', self.index, self.index)
-        connection.zadd('sensor1', {value: self.current_index_posix_time})
         
     def delete(self):
-        connection = self.redis_connect()
-        connection.zremrangebyrank('sensor1', self.index, self.index)
-        self.next()
+        try:
+            connection = self.redis_connect()
+            connection.zremrangebyrank('sensor1', self.index, self.index)
+            self.next()
+        except Exception:
+            return
         
     def redis_connect(self) -> rd.Redis:
         connect = rd.Redis(host=self.conf.host, port=self.conf.port, password=self.conf.password)
         return connect
+
     
     def update_plot(self,framedata):
         try:
