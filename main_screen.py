@@ -252,7 +252,7 @@ class main_screen(ttk.Frame):
         while True:
             response = connect.zrevrange('sensor1', 0, query_amount, withscores=True)
             i = 0
-            new_GraphDataY = np.zeros(len(response))
+            new_GraphDataY = np.zeros(self.conf.graph_history)
         
             for reading in response:
                 new_GraphDataY[i] = reading[0]
